@@ -4,7 +4,7 @@ public class Main {
     private static final int DATA_ARRAY_SIZE = 10;
 
     private int totalSum;
-    private int currentIndex;
+    volatile private int currentIndex;
     private int[] dataArray;
     private CustomLock lock = new CustomLock(THREADS_NUMBER);
 
@@ -38,8 +38,7 @@ public class Main {
         lock.lock(threadID);
         try {
             if (currentIndex < DATA_ARRAY_SIZE) {
-                totalSum += dataArray[currentIndex];
-                currentIndex++;
+                totalSum += dataArray[currentIndex++];
                 System.out.print(Thread.currentThread());
                 System.out.println(" currentSum: " + totalSum);
             }

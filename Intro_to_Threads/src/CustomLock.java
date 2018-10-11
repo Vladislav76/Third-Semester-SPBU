@@ -1,16 +1,18 @@
+import java.util.Arrays;
+
 public class CustomLock {
 
-     volatile private int[] level;
-     volatile private int[] victim;
+    private boolean[] flags;
+    private int victim;
 
     public CustomLock(int threadsNumber) {
-        level = new int[threadsNumber];
-        victim = new int[threadsNumber];
+        flags = new boolean[threadsNumber];
+        Arrays.fill(flags, false);
     }
 
-    private boolean isOther(int threadID, int l) {
-        for (int i = 0; i < level.length; i++) {
-            if (i != threadID && level[i] >= l) {
+    private boolean areOthersWaiting(int threadID) {
+        for (int i = 0; i < flags.length; i++) {
+            if (flags[i] && i != threadID) {
                 return true;
             }
         }
@@ -18,25 +20,19 @@ public class CustomLock {
     }
 
     public void lock(int threadID) {
-        for (int l = 1; l < level.length; l++) {
-            level[threadID] = l;
-            victim[l] = threadID;
-            while (isOther(threadID, l) && victim[l] == threadID) {}
-        }
+        flags[threadID] = true;
+        victim = threadID;
+        while (areOthersWaiting(threadID) && victim == threadID) {}
     }
 
     public void info() {
-        String s = "";
-        StringBuffer sb = new StringBuffer();
-        StringBuffer sb2 = new StringBuffer();
-        for (int i = 0; i < level.length; i++) {
-            sb.append(level[i]);
-            sb2.append(victim[i]);
+        for (int i = 0; i < flags.length; i++) {
+            System.out.print(flags[i] + " ");
         }
-        System.out.println(sb.toString() + " " + sb2.toString());
+        System.out.println(victim);
     }
 
     public void unlock(int threadID) {
-        level[threadID] = 0;
+        flags[threadID] = false;
     }
 }
