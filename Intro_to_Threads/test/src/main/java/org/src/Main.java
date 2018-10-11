@@ -1,3 +1,5 @@
+package org.src;
+
 public class Main {
 
     private static int totalSum;
@@ -41,8 +43,8 @@ public class Main {
         try {
             if (currentIndex <= maxNumber) {
                 totalSum += currentIndex++;
-                System.out.print(Thread.currentThread());
-                System.out.println(" currentSum: " + totalSum);
+//                System.out.print(Thread.currentThread());
+//                System.out.println(" currentSum: " + totalSum);
             }
         }
         finally {
