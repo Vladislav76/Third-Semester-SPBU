@@ -9,14 +9,14 @@ public class Testing {
     private Movement movement = new Movement();
 
     private boolean test_1_1() {
-        String fileName = "test/src/main/java/input/turtle_test_1";
+        String fileName = "test/src/main/input/turtle_test_1";
         double correctX = 1.22;
         double correctY = 56.58;
         return testAndCheck(fileName, correctX, correctY);
     }
 
     private boolean test_1_2() {
-        String fileName = "test/src/main/java/input/turtle_test_2";
+        String fileName = "test/src/main/input/turtle_test_2";
         double correctX = 100.22;
         double correctY = 36.58;
         return testAndCheck(fileName, correctX, correctY);

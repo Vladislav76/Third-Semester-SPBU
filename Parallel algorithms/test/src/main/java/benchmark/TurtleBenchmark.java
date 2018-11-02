@@ -45,10 +45,10 @@ public class TurtleBenchmark {
     public static class State1 {
         @Setup(Level.Trial)
         public void doSetup() {
-            String fileName1 = "src/main/java/input/turtle_example_1";
-            String fileName2 = "src/main/java/input/turtle_example_2";
-            String fileName3 = "src/main/java/input/turtle_example_3";
-            String fileName4 = "src/main/java/input/turtle_example_4";
+            String fileName1 = "src/main/input/turtle_example_1";
+            String fileName2 = "src/main/input/turtle_example_2";
+            String fileName3 = "src/main/input/turtle_example_3";
+            String fileName4 = "src/main/input/turtle_example_4";
             try {
                 pair1 = readFileAsPairOfIntArrays(fileName1);
                 pair2 = readFileAsPairOfIntArrays(fileName2);

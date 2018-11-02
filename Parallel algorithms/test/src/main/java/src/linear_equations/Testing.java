@@ -9,13 +9,13 @@ public class Testing {
     private Solution solution = new Solution();
 
     private boolean test_1_1() {
-        String fileName = "test/src/main/java/input/equations_test_1";
+        String fileName = "test/src/main/input/equations_test_1";
         double correctResult = 64;
         return testAndCheck(fileName, correctResult);
     }
 
     private boolean test_1_2() {
-        String fileName = "test/src/main/java/input/equations_test_2";
+        String fileName = "test/src/main/input/equations_test_2";
         double correctResult = 109600;
         return testAndCheck(fileName, correctResult);
     }

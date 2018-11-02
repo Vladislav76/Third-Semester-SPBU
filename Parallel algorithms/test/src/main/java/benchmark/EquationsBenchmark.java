@@ -46,10 +46,10 @@ public class EquationsBenchmark {
     public static class State1 {
         @Setup(Level.Trial)
         public void doSetup() {
-            String fileName1 = "src/main/java/input/equations_example_1";
-            String fileName2 = "src/main/java/input/equations_example_2";
-            String fileName3 = "src/main/java/input/equations_example_3";
-            String fileName4 = "src/main/java/input/equations_example_4";
+            String fileName1 = "src/main/input/equations_example_1";
+            String fileName2 = "src/main/input/equations_example_2";
+            String fileName3 = "src/main/input/equations_example_3";
+            String fileName4 = "src/main/input/equations_example_4";
             try {
                 pair1 = readFileAsPairOfDoubleArrays(fileName1);
                 pair2 = readFileAsPairOfDoubleArrays(fileName2);

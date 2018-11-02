@@ -7,22 +7,22 @@ public class Testing {
     private Analysis analysis = new Analysis();
 
     private boolean test_1_1() {
-        String fileName = "test/src/main/java/input/parentheses_example_1";
+        String fileName = "test/src/main/input/parentheses_example_1";
         return testAndCheck(fileName, false);
     }
 
     private boolean test_1_2() {
-        String fileName = "test/src/main/java/input/parentheses_example_2";
+        String fileName = "test/src/main/input/parentheses_example_2";
         return testAndCheck(fileName, true);
     }
 
     private boolean test_1_3() {
-        String fileName = "test/src/main/java/input/parentheses_example_3";
+        String fileName = "test/src/main/input/parentheses_example_3";
         return testAndCheck(fileName, false);
     }
 
     private boolean test_1_4() {
-        String fileName = "test/src/main/java/input/parentheses_example_4";
+        String fileName = "test/src/main/input/parentheses_example_4";
         return testAndCheck(fileName, true);
     }
 

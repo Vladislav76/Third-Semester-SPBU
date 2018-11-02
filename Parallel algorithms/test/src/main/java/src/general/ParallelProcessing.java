@@ -23,7 +23,9 @@ public class ParallelProcessing {
             currentWorkingThreadsNumber = remainingOperationsNumber;
         }
 
-        for (int i = 0; i < currentWorkingThreadsNumber; i++) {
+        int shift = step;
+
+        for (int i = 0; i < currentWorkingThreadsNumber - 1; i++) {
             int startPosition = currentPosition;
             int operationsNumber = operationsNumberOfThread - 1;
             if (remainingOperationsNumber > 0) {
@@ -32,7 +34,6 @@ public class ParallelProcessing {
             }
             int finishPosition = startPosition + operationsNumber * step;
 
-            int shift = step;
             threads[i] = new Thread(() -> {
                 for (int k = startPosition; k <= finishPosition; k += shift) {
                     fun.process(k, step / 2);
@@ -41,17 +42,24 @@ public class ParallelProcessing {
             currentPosition = finishPosition + step;
         }
 
-        for (int i = 0; i < currentWorkingThreadsNumber; i++) {
+        for (int i = 0; i < currentWorkingThreadsNumber - 1; i++) {
             threads[i].start();
         }
 
-        for (int i = 0; i < currentWorkingThreadsNumber; i++) {
-            try {
+        //starting main thread
+        int operationsNumber = operationsNumberOfThread - 1 + remainingOperationsNumber;
+        int finishPosition = currentPosition + operationsNumber * step;
+        for (int k = currentPosition; k <= finishPosition; k += shift) {
+            fun.process(k, step / 2);
+        }
+
+        try {
+            for (int i = 0; i < currentWorkingThreadsNumber - 1; i++) {
                 threads[i].join();
             }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -65,8 +73,9 @@ public class ParallelProcessing {
         }
 
         int[] finishPositions = new int[currentWorkingThreadsNumber];
+        int shift = (offset == 0) ? 0 : 1;
 
-        for (int i = 0; i < currentWorkingThreadsNumber; i++) {
+        for (int i = 0; i < currentWorkingThreadsNumber - 1; i++) {
             int startPosition = currentPosition;
             int operationsNumber = operationsNumberOfThread - 1;
             if (remainingOperationsNumber > 0) {
@@ -75,7 +84,6 @@ public class ParallelProcessing {
             }
             int finishPosition = startPosition + operationsNumber;
             finishPositions[i] = finishPosition;
-            int shift = (offset == 0) ? 0 : 1;
             threads[i] = new Thread(() -> {
                 for (int k = startPosition + shift; k <= finishPosition; k++) {
                     fun.process(k, offset);
@@ -84,17 +92,25 @@ public class ParallelProcessing {
             currentPosition = finishPosition + 1;
         }
 
-        for (int i = 0; i < currentWorkingThreadsNumber; i++) {
+        for (int i = 0; i < currentWorkingThreadsNumber - 1; i++) {
             threads[i].start();
         }
 
-        for (int i = 0; i < currentWorkingThreadsNumber; i++) {
-            try {
+        //starting main thread
+        int operationsNumber = operationsNumberOfThread - 1 + remainingOperationsNumber;
+        int finishPosition = currentPosition + operationsNumber;
+        finishPositions[finishPositions.length - 1] = finishPosition;
+        for (int k = currentPosition + shift; k <= finishPosition; k++) {
+            fun.process(k, offset);
+        }
+
+        try {
+            for (int i = 0; i < currentWorkingThreadsNumber - 1; i++) {
                 threads[i].join();
             }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         if (offset != 0) {
