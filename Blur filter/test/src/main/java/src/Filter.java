@@ -1,19 +1,13 @@
+package src;
+
 import java.awt.image.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Filter {
 
-    public static final int HORIZONTAL_PROCESSING_MODE = 1;
-    public static final int VERTICAL_PROCESSING_MODE = 2;
-
-    private static final int PIXEL_RADIUS = 3;
-    private static final int RGB = 3;
-
-    private BufferedImage sourceImage;
-    private BufferedImage resultImage;
-    private int imageSizeX;
-    private int imageSizeY;
-    private int maxIndex;
-    volatile private int currentIndex;
+    public Filter() {
+        threads = new Thread[0];
+    }
 
     public void setImage(BufferedImage image) {
         this.sourceImage = image;
@@ -22,21 +16,21 @@ public class Filter {
         resultImage = new BufferedImage(imageSizeX, imageSizeY, sourceImage.getType());
     }
 
+    private void setThreadsNumber (int threadsNumber) {
+        if (threadsNumber != threads.length) {
+            threads = new Thread[threadsNumber];
+        }
+    }
+
     public BufferedImage getResultImage() {
         return resultImage;
     }
 
     public void process(int mode, int threadsNumber) {
-        if (sourceImage != null) {
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    while (currentIndex < maxIndex) {
-                        processLine(mode, currentIndex++);
-                    }
-                }
-            };
-            currentIndex = 0;
+        if (sourceImage != null && threadsNumber > 0) {
+            threadsNumber--;
+            setThreadsNumber(threadsNumber);
+            currentIndex.set(0);
             switch (mode) {
                 case HORIZONTAL_PROCESSING_MODE:
                     maxIndex = imageSizeY;
@@ -47,20 +41,26 @@ public class Filter {
                 default:
                     maxIndex = 0;
             }
+            Runnable r = () -> {
+                while (currentIndex.get() < maxIndex) {
+                    processLine(mode, currentIndex.getAndAdd(1));
+                }
+            };
 
-            Thread[] threads = new Thread[threadsNumber];
-            for (int k = 0; k < threadsNumber; k++) {
+            for (int k = 0; k < threads.length; k++) {
                 threads[k] = new Thread(r);
                 threads[k].start();
             }
 
-            for (int k = 0; k < threadsNumber; k++) {
-                try {
+            r.run();
+
+            try {
+                for (int k = 0; k < threads.length; k++) {
                     threads[k].join();
                 }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -107,4 +107,18 @@ public class Filter {
     private boolean isWithinImageArea(int x, int y) {
         return (x >= 0 && y >= 0 && x < imageSizeX && y < imageSizeY);
     }
+
+    public static final int HORIZONTAL_PROCESSING_MODE = 1;
+    public static final int VERTICAL_PROCESSING_MODE = 2;
+
+    private static final int PIXEL_RADIUS = 3;
+    private static final int RGB = 3;
+
+    private BufferedImage sourceImage;
+    private BufferedImage resultImage;
+    private int imageSizeX;
+    private int imageSizeY;
+    private int maxIndex;
+    volatile private AtomicInteger currentIndex = new AtomicInteger();
+    private Thread[] threads;
 }

@@ -28,164 +28,161 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sample;
+
+package benchmark;
 
 import org.openjdk.jmh.annotations.*;
 
+import src.Filter;
+import src.Main;
+
 import java.util.concurrent.TimeUnit;
 
-import org.src.Filter;
-import org.src.Main;
-
-public class MyBenchmark {
+public class BlurFilterBenchmark {
 
     @State(Scope.Thread)
     public static class State1 {
         @Setup(Level.Trial)
         public void doSetup() {
-            Main.filterSetup("/home/vladislav/Documents/Development/GitHub/Homework/3rd_sem/Third_Semester_SPBU/Blur_filter/resources",
-                    "Glasses.jpeg", filter);
+            String dirName = "src/main/input";
+            String fileName1 = "Glasses.jpeg";
+            String fileName2 = "CallOfDuty.jpg";
+            String fileName3 = "Horizon.jpg";
+            filter1 = new Filter();
+            Main.filterSetup(dirName, fileName1, filter1);
+            filter2 = new Filter();
+            Main.filterSetup(dirName, fileName2, filter2);
+            filter3 = new Filter();
+            Main.filterSetup(dirName, fileName3, filter3);
         }
-        public Filter filter = new Filter();
+        public Filter filter1;
+        public Filter filter2;
+        public Filter filter3;
     }
+
+    //---GROUP 1---
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_1_Thread_Horizontal(State1 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 1);
+        state.filter1.process(Filter.HORIZONTAL_PROCESSING_MODE, 1);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_2_Threads_Horizontal(State1 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 2);
+        state.filter1.process(Filter.HORIZONTAL_PROCESSING_MODE, 2);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_4_Threads_Horizontal(State1 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 4);
+        state.filter1.process(Filter.HORIZONTAL_PROCESSING_MODE, 4);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_8_Threads_Horizontal(State1 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 8);
+        state.filter1.process(Filter.HORIZONTAL_PROCESSING_MODE, 8);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_1_Thread_Vertical(State1 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 1);
+        state.filter1.process(Filter.VERTICAL_PROCESSING_MODE, 1);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_2_Threads_Vertical(State1 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 2);
+        state.filter1.process(Filter.VERTICAL_PROCESSING_MODE, 2);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_4_Threads_Vertical(State1 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 4);
+        state.filter1.process(Filter.VERTICAL_PROCESSING_MODE, 4);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
     public void _525x350_8_Threads_Vertical(State1 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 8);
+        state.filter1.process(Filter.VERTICAL_PROCESSING_MODE, 8);
     }
 
-    @State(Scope.Thread)
-    public static class State2 {
-        @Setup(Level.Trial)
-        public void doSetup() {
-            Main.filterSetup("/home/vladislav/Documents/Development/GitHub/Homework/3rd_sem/Third_Semester_SPBU/Blur_filter/resources",
-                    "CallOfDuty.jpg", filter);
-        }
-        public Filter filter = new Filter();
+    //---GROUP 2---
+
+    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
+    public void _1920x1080_1_Thread_Horizontal(State1 state) {
+        state.filter2.process(Filter.HORIZONTAL_PROCESSING_MODE, 1);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_1_Thread_Horizontal(State2 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 1);
+    public void _1920x1080_2_Threads_Horizontal(State1 state) {
+        state.filter2.process(Filter.HORIZONTAL_PROCESSING_MODE, 2);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_2_Threads_Horizontal(State2 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 2);
+    public void _1920x1080_4_Threads_Horizontal(State1 state) {
+        state.filter2.process(Filter.HORIZONTAL_PROCESSING_MODE, 4);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_4_Threads_Horizontal(State2 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 4);
+    public void _1920x1080_8_Threads_Horizontal(State1 state) {
+        state.filter2.process(Filter.HORIZONTAL_PROCESSING_MODE, 8);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_8_Threads_Horizontal(State2 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 8);
+    public void _1920x1080_1_Thread_Vertical(State1 state) {
+        state.filter2.process(Filter.VERTICAL_PROCESSING_MODE, 1);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_1_Thread_Vertical(State2 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 1);
+    public void _1920x1080_2_Threads_Vertical(State1 state) {
+        state.filter2.process(Filter.VERTICAL_PROCESSING_MODE, 2);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_2_Threads_Vertical(State2 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 2);
+    public void _1920x1080_4_Threads_Vertical(State1 state) {
+        state.filter2.process(Filter.VERTICAL_PROCESSING_MODE, 4);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_4_Threads_Vertical(State2 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 4);
+    public void _1920x1080_8_Threads_Vertical(State1 state) {
+        state.filter2.process(Filter.VERTICAL_PROCESSING_MODE, 8);
+    }
+
+    //---GROUP 3---
+
+    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
+    public void _3840x2160_1_Thread_Horizontal(State1 state) {
+        state.filter3.process(Filter.HORIZONTAL_PROCESSING_MODE, 1);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1920x1080_8_Threads_Vertical(State2 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 8);
-    }
-
-    @State(Scope.Thread)
-    public static class State3 {
-        @Setup(Level.Trial)
-        public void doSetup() {
-            Main.filterSetup("/home/vladislav/Documents/Development/GitHub/Homework/3rd_sem/Third_Semester_SPBU/Blur_filter/resources",
-                    "Horizon.jpg", filter);
-        }
-        public Filter filter = new Filter();
+    public void _3840x2160_2_Threads_Horizontal(State1 state) {
+        state.filter3.process(Filter.HORIZONTAL_PROCESSING_MODE, 2);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_1_Thread_Horizontal(State3 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 1);
+    public void _3840x2160_4_Threads_Horizontal(State1 state) {
+        state.filter3.process(Filter.HORIZONTAL_PROCESSING_MODE, 4);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_2_Threads_Horizontal(State3 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 2);
+    public void _3840x2160_8_Threads_Horizontal(State1 state) {
+        state.filter3.process(Filter.HORIZONTAL_PROCESSING_MODE, 8);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_4_Threads_Horizontal(State3 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 4);
+    public void _3840x2160_1_Thread_Vertical(State1 state) {
+        state.filter3.process(Filter.VERTICAL_PROCESSING_MODE, 1);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_8_Threads_Horizontal(State3 state) {
-        state.filter.process(state.filter.HORIZONTAL_PROCESSING_MODE, 8);
+    public void _3840x2160_2_Threads_Vertical(State1 state) {
+        state.filter3.process(Filter.VERTICAL_PROCESSING_MODE, 2);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_1_Thread_Vertical(State3 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 1);
+    public void _3840x2160_4_Threads_Vertical(State1 state) {
+        state.filter3.process(Filter.VERTICAL_PROCESSING_MODE, 4);
     }
 
     @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_2_Threads_Vertical(State3 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_4_Threads_Vertical(State3 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _3840x2160_8_Threads_Vertical(State3 state) {
-        state.filter.process(state.filter.VERTICAL_PROCESSING_MODE, 8);
+    public void _3840x2160_8_Threads_Vertical(State1 state) {
+        state.filter3.process(Filter.VERTICAL_PROCESSING_MODE, 8);
     }
 }
