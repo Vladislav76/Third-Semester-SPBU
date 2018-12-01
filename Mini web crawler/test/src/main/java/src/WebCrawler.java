@@ -5,6 +5,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import src.collections.CustomConcurrentQueue;
+import src.collections.CustomConcurrentSet;
 
 import java.io.*;
 import java.net.URL;
@@ -13,8 +15,8 @@ import java.util.concurrent.*;
 public class WebCrawler {
 
     public WebCrawler() {
-        allPages = new ConcurrentSkipListSet<>();
-        notVisitedPages = new ConcurrentLinkedQueue<>();
+        allPages = new CustomConcurrentSet<>();
+        notVisitedPages = new CustomConcurrentQueue<>();
         executorService = Executors.newSingleThreadExecutor();
 
         final String folderName = "/home/vladislav/Downloads/Pages/";
@@ -31,9 +33,8 @@ public class WebCrawler {
                         Elements links = doc.select("a[href]");
                         for (Element link : links) {
                             String pageURL = link.attr("abs:href");
-                            if (!allPages.contains(pageURL)) {
+                            if (allPages.add(pageURL)) {
                                 notVisitedPages.add(new Pair<>(pageURL, depth + 1));
-                                allPages.add(pageURL);
                             }
                         }
                     }
@@ -69,15 +70,14 @@ public class WebCrawler {
         this.maxDepth = maxDepth;
         notVisitedPages.add(new Pair<>(this.mainURL, 1));
         allPages.add(this.mainURL);
-
         executorService.execute(searchAndDownloadTask);
         executorService.shutdown();
     }
 
     private String mainURL;
     private int maxDepth;
-    private ConcurrentLinkedQueue<Pair<String, Integer>> notVisitedPages;
-    private ConcurrentSkipListSet<String> allPages;
+    private CustomConcurrentQueue<Pair<String, Integer>> notVisitedPages;
+    private CustomConcurrentSet<String> allPages;
     private ExecutorService executorService;
     private Runnable searchAndDownloadTask;
 }
