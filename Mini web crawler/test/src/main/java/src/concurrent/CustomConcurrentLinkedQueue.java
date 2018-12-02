@@ -1,13 +1,13 @@
-package src.collections;
+package src.concurrent;
 
-public class CustomConcurrentQueue<E> {
+public class CustomConcurrentLinkedQueue<E> {
 
-    public CustomConcurrentQueue() {
-        size = 0;
+    public CustomConcurrentLinkedQueue() {
         head = new Node<>(null);
         tail = new Node<>(null);
         head.next = tail;
         tail.pred = head;
+        size = 0;
     }
 
     public int size() {
@@ -27,32 +27,29 @@ public class CustomConcurrentQueue<E> {
     }
 
     public E poll() {
-        try {
-            head.lock();
-            if (head.next != tail) {
-                E result = head.next.item;
-                head.next = head.next.next;
-                head.next.pred = head;
-                size--;
-                return result;
-            }
-            else {
-                return null;
-            }
-        }
-        finally {
+        head.lock();
+        if (head.next != tail) {
+            E result = head.next.item;
+            head.next = head.next.next;
+            head.next.pred = head;
+            size--;
             head.unlock();
+            return result;
+        }
+        else {
+            head.unlock();
+            return null;
         }
     }
 
-    private int size;
     private Node<E> head;
     private Node<E> tail;
+    private int size;
 
 //    public static void main(String[] args) {
 //
 //        for (int i = 0; i < 10; i++) {
-//        CustomConcurrentQueue<String> set = new CustomConcurrentQueue<>();
+//        CustomConcurrentLinkedQueue<String> set = new CustomConcurrentLinkedQueue<>();
 //
 //        Thread thread1 = new Thread(() -> {
 //            set.add("A");

@@ -5,8 +5,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import src.collections.CustomConcurrentQueue;
-import src.collections.CustomConcurrentSet;
+import src.concurrent.CustomConcurrentLinkedQueue;
+import src.concurrent.CustomConcurrentSkipListSet;
+import src.concurrent.CustomThreadExecutor;
 
 import java.io.*;
 import java.net.URL;
@@ -14,16 +15,13 @@ import java.util.concurrent.*;
 
 public class WebCrawler {
 
-    public WebCrawler() {
-        allPages = new CustomConcurrentSet<>();
-        notVisitedPages = new CustomConcurrentQueue<>();
-        executorService = Executors.newSingleThreadExecutor();
-
+    private class SearchAndDownloadTask implements Runnable {
         final String folderName = "/home/vladislav/Downloads/Pages/";
 
-        searchAndDownloadTask = () -> {
-            while (notVisitedPages.size() > 0) {
-                Pair<String, Integer> page = notVisitedPages.poll();
+        @Override
+        public void run() {
+            Pair<String, Integer> page = notVisitedPages.poll();
+            if (page != null) {
                 try {
                     String url = page.getKey();
                     int depth = page.getValue();
@@ -35,11 +33,12 @@ public class WebCrawler {
                             String pageURL = link.attr("abs:href");
                             if (allPages.add(pageURL)) {
                                 notVisitedPages.add(new Pair<>(pageURL, depth + 1));
+                                executorService.execute(new SearchAndDownloadTask());
                             }
                         }
                     }
-                    System.out.println(url + ";");
 
+                    System.out.println(url + ";");
                     int indexName = url.lastIndexOf("/");
                     if (indexName == url.length() - 1) {
                         indexName = url.substring(0, indexName).lastIndexOf("/");
@@ -48,21 +47,30 @@ public class WebCrawler {
 
                     InputStream in = new URL(url).openStream();
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(folderName + name));
-                    for (int b; (b = in.read()) != -1;) {
-                        out.write(b);
+                    for (int b; (b = in.read()) != -1; ) {
+                            out.write(b);
                     }
                     out.close();
                     in.close();
+
+                    downloadedPagesNumber++;
+                    if (downloadedPagesNumber == allPages.size()) {
+                        executorService.shutdown();
+                    }
                 }
                 catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        };
+        }
     }
 
-    public void setThreadsNumber(int threadsNumber) {
-        executorService = Executors.newFixedThreadPool(threadsNumber);
+    public WebCrawler(int threadsNumber) {
+        downloadedPagesNumber = 0;
+        allPages = new CustomConcurrentSkipListSet<>();
+        notVisitedPages = new CustomConcurrentLinkedQueue<>();
+//        executorService = Executors.newFixedThreadPool(threadsNumber);
+        executorService = new CustomThreadExecutor(threadsNumber);
     }
 
     public void crawl(String mainURL, int maxDepth) {
@@ -70,14 +78,13 @@ public class WebCrawler {
         this.maxDepth = maxDepth;
         notVisitedPages.add(new Pair<>(this.mainURL, 1));
         allPages.add(this.mainURL);
-        executorService.execute(searchAndDownloadTask);
-        executorService.shutdown();
+        executorService.execute(new SearchAndDownloadTask());
     }
 
     private String mainURL;
     private int maxDepth;
-    private CustomConcurrentQueue<Pair<String, Integer>> notVisitedPages;
-    private CustomConcurrentSet<String> allPages;
+    private CustomConcurrentLinkedQueue<Pair<String, Integer>> notVisitedPages;
+    private CustomConcurrentSkipListSet<String> allPages;
     private ExecutorService executorService;
-    private Runnable searchAndDownloadTask;
+    private volatile int downloadedPagesNumber;
 }

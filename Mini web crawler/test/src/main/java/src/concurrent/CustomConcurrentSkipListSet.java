@@ -1,10 +1,8 @@
-package src.collections;
+package src.concurrent;
 
-import java.lang.Thread;
+public class CustomConcurrentSkipListSet<E> {
 
-public class CustomConcurrentSet<E> {
-
-    public CustomConcurrentSet() {
+    public CustomConcurrentSkipListSet() {
         head = new Node<>(null);
         tail = new Node<>(null);
         head.next = tail;
@@ -45,9 +43,10 @@ public class CustomConcurrentSet<E> {
 
     public boolean contains(E e) {
         int key = e.hashCode();
-        Node<E> curr = head.next;
+        Node<E> curr = null;
         try {
             head.lock();
+            curr = head.next;
             head.next.lock();
             while (curr != tail && curr.key <= key) {
                 if (e.equals(curr.item)) {
@@ -72,7 +71,7 @@ public class CustomConcurrentSet<E> {
 //    public static void main(String[] args) {
 //
 //        for (int i = 0; i < 100; i++) {
-//            CustomConcurrentSet<String> set = new CustomConcurrentSet<>();
+//            CustomConcurrentSkipListSet<String> set = new CustomConcurrentSkipListSet<>();
 //            try {
 //                Thread thread1 = new Thread(() -> {
 //                    set.add("A");
