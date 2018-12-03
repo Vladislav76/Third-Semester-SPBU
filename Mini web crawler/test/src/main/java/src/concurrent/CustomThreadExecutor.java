@@ -2,17 +2,15 @@ package src.concurrent;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CustomThreadExecutor implements ExecutorService {
 
     class mTasksExecutor implements Runnable {
         @Override
         public void run() {
-            while (!isShutdown) {
+            while (!isShutdown.get()) {
                 Runnable task = workQueue.poll();
                 if (task != null) {
                     task.run();
@@ -25,7 +23,7 @@ public class CustomThreadExecutor implements ExecutorService {
         this.threadsNumber = threadsNumber;
         threads = new Thread[threadsNumber];
         workQueue = new CustomConcurrentLinkedQueue<>();
-        isShutdown = false;
+        isShutdown = new AtomicBoolean(false);
 
         for (int i = 0; i < this.threadsNumber; i++) {
             threads[i] = new Thread(new mTasksExecutor());
@@ -35,25 +33,25 @@ public class CustomThreadExecutor implements ExecutorService {
 
     @Override
     public void execute(Runnable task) {
-        if (!isShutdown()) {
+        if (!isShutdown.get()) {
             workQueue.add(task);
         }
     }
 
     @Override
     public void shutdown() {
-        isShutdown = true;
+        isShutdown.set(true);
     }
 
     @Override
     public boolean isShutdown() {
-        return isShutdown;
+        return isShutdown.get();
     }
 
     private int threadsNumber;
     private CustomConcurrentLinkedQueue<Runnable> workQueue;
     private Thread[] threads;
-    private volatile boolean isShutdown;
+    private AtomicBoolean isShutdown;
 
     //STUBS
     public <T> Future<T> submit(Runnable task, T result) {return null;}

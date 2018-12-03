@@ -12,19 +12,20 @@ import src.concurrent.CustomThreadExecutor;
 import java.io.*;
 import java.net.URL;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WebCrawler {
 
     private class SearchAndDownloadTask implements Runnable {
-        final String folderName = "/home/vladislav/Downloads/Pages/";
-
+        final String folderName = "/media/vladislav/My Passport/Pages";
+//        final String folderName = "/home/vladislav/Downloads/Pages";
         @Override
         public void run() {
-            Pair<String, Integer> page = notVisitedPages.poll();
-            if (page != null) {
+            Pair<String, Integer> page;
+            if ((page = notVisitedPages.poll()) != null) {
+                String url = page.getKey();
+                int depth = page.getValue();
                 try {
-                    String url = page.getKey();
-                    int depth = page.getValue();
                     Document doc = Jsoup.connect(url).get();
 
                     if (depth < maxDepth) {
@@ -38,7 +39,8 @@ public class WebCrawler {
                         }
                     }
 
-                    System.out.println(url + ";");
+                  //  System.out.println(url + ";");
+
                     int indexName = url.lastIndexOf("/");
                     if (indexName == url.length() - 1) {
                         indexName = url.substring(0, indexName).lastIndexOf("/");
@@ -48,25 +50,25 @@ public class WebCrawler {
                     InputStream in = new URL(url).openStream();
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(folderName + name));
                     for (int b; (b = in.read()) != -1; ) {
-                            out.write(b);
+                        out.write(b);
                     }
                     out.close();
                     in.close();
-
-                    downloadedPagesNumber++;
-                    if (downloadedPagesNumber == allPages.size()) {
-                        executorService.shutdown();
-                    }
                 }
                 catch (IOException e) {
-                    e.printStackTrace();
+                  //  e.printStackTrace();
+                }
+                finally {
+                    if (!executorService.isShutdown() && downloadedPagesNumber.incrementAndGet() >= allPages.size()) {
+                        executorService.shutdown();
+                    }
                 }
             }
         }
     }
 
     public WebCrawler(int threadsNumber) {
-        downloadedPagesNumber = 0;
+        downloadedPagesNumber = new AtomicInteger(0);
         allPages = new CustomConcurrentSkipListSet<>();
         notVisitedPages = new CustomConcurrentLinkedQueue<>();
 //        executorService = Executors.newFixedThreadPool(threadsNumber);
@@ -79,6 +81,7 @@ public class WebCrawler {
         notVisitedPages.add(new Pair<>(this.mainURL, 1));
         allPages.add(this.mainURL);
         executorService.execute(new SearchAndDownloadTask());
+        while (!executorService.isShutdown()) {}
     }
 
     private String mainURL;
@@ -86,5 +89,5 @@ public class WebCrawler {
     private CustomConcurrentLinkedQueue<Pair<String, Integer>> notVisitedPages;
     private CustomConcurrentSkipListSet<String> allPages;
     private ExecutorService executorService;
-    private volatile int downloadedPagesNumber;
+    private AtomicInteger downloadedPagesNumber;
 }

@@ -5,8 +5,7 @@ public class CustomConcurrentSkipListSet<E> {
     public CustomConcurrentSkipListSet() {
         head = new Node<>(null);
         tail = new Node<>(null);
-        head.next = tail;
-        tail.pred = head;
+        head.setNext(tail);
         size = 0;
     }
 
@@ -17,88 +16,57 @@ public class CustomConcurrentSkipListSet<E> {
     public boolean add(E e) {
         int key = e.hashCode();
         head.lock();
-        head.next.lock();
-        Node<E> curr = head.next;
-        while (curr != tail && curr.key <= key) {
-            if (e.equals(curr.item)) {
-                curr.pred.unlock();
+        head.getNext().lock();
+        Node<E> pred = head;
+        Node<E> curr = head.getNext();
+        while (curr != tail && curr.getKey() <= key) {
+            if (e.equals(curr.getItem())) {
+                pred.unlock();
                 curr.unlock();
                 return false;
             }
-            curr.pred.unlock();
-            curr = curr.next;
+            pred.unlock();
+            pred = curr;
+            curr = curr.getNext();
             curr.lock();
         }
         Node<E> newNode = new Node<>(e);
         size++;
-        newNode.key = key;
-        newNode.next = curr;
-        newNode.pred = curr.pred;
-        curr.pred.next = newNode;
-        curr.pred = newNode;
+        newNode.setKey(key);
+        newNode.setNext(curr);
+        pred.setNext(newNode);
+        pred.unlock();
         curr.unlock();
-        newNode.pred.unlock();
         return true;
     }
 
     public boolean contains(E e) {
         int key = e.hashCode();
-        Node<E> curr = null;
+        head.lock();
+        head.getNext().lock();
+        Node<E> pred = head;
+        Node<E> curr = head.getNext();
         try {
-            head.lock();
-            curr = head.next;
-            head.next.lock();
-            while (curr != tail && curr.key <= key) {
-                if (e.equals(curr.item)) {
+            curr = head.getNext();
+            while (curr != tail && curr.getKey() <= key) {
+                if (e.equals(curr.getItem())) {
                     return true;
                 }
-                curr.pred.unlock();
-                curr = curr.next;
+                pred.unlock();
+                curr = curr.getNext();
                 curr.lock();
             }
             return false;
         }
         finally {
-            curr.pred.unlock();
+            pred.unlock();
             curr.unlock();
         }
     }
 
     private Node<E> head;
     private Node<E> tail;
-    private int size;
-
-//    public static void main(String[] args) {
-//
-//        for (int i = 0; i < 100; i++) {
-//            CustomConcurrentSkipListSet<String> set = new CustomConcurrentSkipListSet<>();
-//            try {
-//                Thread thread1 = new Thread(() -> {
-//                    set.add("A");
-//                    set.add("B");
-//                    set.add("C");
-//                });
-//
-//                Thread thread2 = new Thread(() -> {
-//                    set.add("A");
-//                    set.add("C");
-//                    set.add("D");
-//                    set.add("E");
-//                    set.add("A");
-//                });
-//
-//                thread1.start();
-//                thread2.start();
-//
-//                thread1.join();
-//                thread2.join();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            System.out.println(set.contains("B"));
-//        }
-//    }
+    private volatile int size;
 }
 
 
