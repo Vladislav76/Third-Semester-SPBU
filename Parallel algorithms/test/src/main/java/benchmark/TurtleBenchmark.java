@@ -39,119 +39,40 @@ import src.turtle.Movement;
 
 import static src.general.FileReader.readFileAsPairOfIntArrays;
 
+@Fork(1)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 5, time = 1)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.SECONDS)
 public class TurtleBenchmark {
 
     @State(Scope.Thread)
     public static class State1 {
+
         @Setup(Level.Trial)
         public void doSetup() {
-            String fileName1 = "src/main/input/turtle_example_1";
-            String fileName2 = "src/main/input/turtle_example_2";
-            String fileName3 = "src/main/input/turtle_example_3";
-            String fileName4 = "src/main/input/turtle_example_4";
+            String dirName = "src/main/input/";
             try {
-                pair1 = readFileAsPairOfIntArrays(fileName1);
-                pair2 = readFileAsPairOfIntArrays(fileName2);
-                pair3 = readFileAsPairOfIntArrays(fileName3);
-                pair4 = readFileAsPairOfIntArrays(fileName4);
+                pair = readFileAsPairOfIntArrays(dirName + fileName);
                 movement = new Movement();
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        public Pair<int[], int[]> pair1;
-        public Pair<int[], int[]> pair2;
-        public Pair<int[], int[]> pair3;
-        public Pair<int[], int[]> pair4;
-        public Movement movement;
+
+        @Param({"turtle_example_1kB", "turtle_example_64kB", "turtle_example_1MB", "turtle_example_15MB"})
+        String fileName;
+
+        @Param({"1", "2", "4", "8"})
+        int threadsNumber;
+
+        Pair<int[], int[]> pair;
+        Movement movement;
     }
 
-    //---GROUP 1---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_1_Thread(State1 state) {
-        state.movement.getLocation(state.pair1.getKey(), state.pair1.getValue(), 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_2_Threads(State1 state) {
-        state.movement.getLocation(state.pair1.getKey(), state.pair1.getValue(), 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_4_Threads(State1 state) {
-        state.movement.getLocation(state.pair1.getKey(), state.pair1.getValue(), 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_8_Threads(State1 state) {
-        state.movement.getLocation(state.pair1.getKey(), state.pair1.getValue(), 8);
-    }
-
-    //---GROUP 2---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_1_Thread(State1 state) {
-        state.movement.getLocation(state.pair2.getKey(), state.pair2.getValue(), 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_2_Threads(State1 state) {
-        state.movement.getLocation(state.pair2.getKey(), state.pair2.getValue(), 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_4_Threads(State1 state) {
-        state.movement.getLocation(state.pair2.getKey(), state.pair2.getValue(), 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_8_Threads(State1 state) {
-        state.movement.getLocation(state.pair2.getKey(), state.pair2.getValue(), 8);
-    }
-
-    //---GROUP 3---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_1_Thread(State1 state) {
-        state.movement.getLocation(state.pair3.getKey(), state.pair3.getValue(), 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_2_Threads(State1 state) {
-        state.movement.getLocation(state.pair3.getKey(), state.pair3.getValue(), 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_4_Threads(State1 state) {
-        state.movement.getLocation(state.pair3.getKey(), state.pair3.getValue(), 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_8_Threads(State1 state) {
-        state.movement.getLocation(state.pair3.getKey(), state.pair3.getValue(), 8);
-    }
-
-    //---GROUP 4---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_1_Thread(State1 state) {
-        state.movement.getLocation(state.pair4.getKey(), state.pair4.getValue(), 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_2_Threads(State1 state) {
-        state.movement.getLocation(state.pair4.getKey(), state.pair4.getValue(), 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_4_Threads(State1 state) {
-        state.movement.getLocation(state.pair4.getKey(), state.pair4.getValue(), 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_8_Threads(State1 state) {
-        state.movement.getLocation(state.pair4.getKey(), state.pair4.getValue(), 8);
+    @Benchmark
+    public void turtle_test(State1 state) {
+        state.movement.getLocation(state.pair.getKey(), state.pair.getValue(), state.threadsNumber);
     }
 }

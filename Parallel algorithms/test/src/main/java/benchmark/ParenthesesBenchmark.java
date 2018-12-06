@@ -38,119 +38,40 @@ import src.parentheses.Analysis;
 
 import static src.general.FileReader.readFileAsString;
 
+@Fork(1)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 5, time = 1)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.SECONDS)
 public class ParenthesesBenchmark {
 
     @State(Scope.Thread)
     public static class State1 {
+
         @Setup(Level.Trial)
         public void doSetup() {
-            String fileName1 = "src/main/input/parentheses_example_1";
-            String fileName2 = "src/main/input/parentheses_example_2";
-            String fileName3 = "src/main/input/parentheses_example_3";
-            String fileName4 = "src/main/input/parentheses_example_4";
+            String dirName = "src/main/input/";
             try {
-                s1 = readFileAsString(fileName1);
-                s2 = readFileAsString(fileName2);
-                s3 = readFileAsString(fileName3);
-                s4 = readFileAsString(fileName4);
+                s = readFileAsString(dirName + fileName);
                 analysis = new Analysis();
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        public String s1;
-        public String s2;
-        public String s3;
-        public String s4;
-        public Analysis analysis;
+
+        @Param({"parentheses_example_1kB", "parentheses_example_64kB", "parentheses_example_1MB", "parentheses_example_15MB"})
+        String fileName;
+
+        @Param({"1", "2", "4", "8"})
+        int threadsNumber;
+
+        String s;
+        Analysis analysis;
     }
 
-    //---GROUP 1---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_1_Thread(State1 state) {
-        state.analysis.isCorrect(state.s1, 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_2_Threads(State1 state) {
-        state.analysis.isCorrect(state.s1, 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_4_Threads(State1 state) {
-        state.analysis.isCorrect(state.s1, 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Kb_8_Threads(State1 state) {
-        state.analysis.isCorrect(state.s1, 8);
-    }
-
-    //---GROUP 2---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_1_Thread(State1 state) {
-        state.analysis.isCorrect(state.s2, 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_2_Threads(State1 state) {
-        state.analysis.isCorrect(state.s2, 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_4_Threads(State1 state) {
-        state.analysis.isCorrect(state.s2, 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _64Kb_8_Threads(State1 state) {
-        state.analysis.isCorrect(state.s2, 8);
-    }
-
-    //---GROUP 3---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_1_Thread(State1 state) {
-        state.analysis.isCorrect(state.s3, 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_2_Threads(State1 state) {
-        state.analysis.isCorrect(state.s3, 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_4_Threads(State1 state) {
-        state.analysis.isCorrect(state.s3, 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _1Mb_8_Threads(State1 state) {
-        state.analysis.isCorrect(state.s3, 8);
-    }
-
-    //---GROUP 4---
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_1_Thread(State1 state) {
-        state.analysis.isCorrect(state.s4, 1);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_2_Threads(State1 state) {
-        state.analysis.isCorrect(state.s4, 2);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_4_Threads(State1 state) {
-        state.analysis.isCorrect(state.s4, 4);
-    }
-
-    @Benchmark @Fork(1) @Warmup(iterations = 2) @Measurement(iterations = 2) @BenchmarkMode(Mode.AverageTime) @OutputTimeUnit(TimeUnit.SECONDS)
-    public void _15Mb_8_Threads(State1 state) {
-        state.analysis.isCorrect(state.s4, 8);
+    @Benchmark
+    public void parentheses_test(State1 state) {
+        state.analysis.isCorrect(state.s, state.threadsNumber);
     }
 }
