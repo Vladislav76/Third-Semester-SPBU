@@ -9,23 +9,15 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class Main {
-    public static void filterSetup(String dirName, String fileName, Filter filter) {
-        try {
-            filter.setImage(ImageIO.read(new File(dirName, fileName)));
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void main(String[] args) {
         String inputDirectoryName = "test/src/main/input";
         String outputDirectoryName = "test/src/main/output";
-        String fileName = "Ak.jpg";
-        Filter filter = new Filter();
+        String fileName = "3840x2160.jpg";
 
-        filterSetup(inputDirectoryName, fileName, filter);
-        filter.process(Filter.HORIZONTAL_PROCESSING_MODE, 6);
+        Filter filter = new Filter(4);
+        filter.setImage(fileName, inputDirectoryName);
+        filter.process(Filter.HORIZONTAL_PROCESSING_MODE);
 
         try {
             BufferedImage resultImage = filter.getResultImage();

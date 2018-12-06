@@ -1,12 +1,22 @@
 package src;
 
+import javax.imageio.ImageIO;
 import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Filter {
 
-    public Filter() {
-        threads = new Thread[0];
+    public Filter(int threadsNumber) {
+        if (threadsNumber > 0) {
+            this.threadsNumber = threadsNumber;
+            threads = new Thread[threadsNumber - 1];
+        }
+        else {
+            System.out.println("ERROR. Threads number must be positive integer!");
+            threads = new Thread[0];
+        }
     }
 
     public void setImage(BufferedImage image) {
@@ -16,9 +26,12 @@ public class Filter {
         resultImage = new BufferedImage(imageSizeX, imageSizeY, sourceImage.getType());
     }
 
-    private void setThreadsNumber (int threadsNumber) {
-        if (threadsNumber != threads.length) {
-            threads = new Thread[threadsNumber];
+    public void setImage(String fileName, String dirName) {
+        try {
+            setImage(ImageIO.read(new File(dirName, fileName)));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -26,10 +39,8 @@ public class Filter {
         return resultImage;
     }
 
-    public void process(int mode, int threadsNumber) {
+    public void process(int mode) {
         if (sourceImage != null && threadsNumber > 0) {
-            threadsNumber--;
-            setThreadsNumber(threadsNumber);
             currentIndex.set(0);
             switch (mode) {
                 case HORIZONTAL_PROCESSING_MODE:
@@ -119,6 +130,7 @@ public class Filter {
     private int imageSizeX;
     private int imageSizeY;
     private int maxIndex;
-    volatile private AtomicInteger currentIndex = new AtomicInteger();
+    private int threadsNumber;
+    private AtomicInteger currentIndex = new AtomicInteger();
     private Thread[] threads;
 }
