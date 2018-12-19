@@ -31,8 +31,8 @@ public class ClientPanel extends JPanel implements Runnable {
     private void connectToServer(int port) {
         serverHandler = new ServerHandler("", port);
         new Thread(serverHandler).start();
-        queries = Repository.getQueriesQueue();
-        images = Repository.getImagesArrayList();
+        queries = serverHandler.getRepository().getQueriesQueue();
+        images = serverHandler.getRepository().getImagesArrayList();
         queries.add(new Query(Query.FILTERS_LIST_CODE));
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -100,7 +100,7 @@ public class ClientPanel extends JPanel implements Runnable {
 
         /* Images table */
         cells = new Object[][] {};
-        tableCellRenderer = new ImageTableCellRenderer();
+        tableCellRenderer = new ImageTableCellRenderer(images);
         table = new JTable(new DefaultTableModel(cells, new String[] {"Name", "Progress", "Status"}));
         table.setDefaultRenderer(Object.class, tableCellRenderer);
         table.setRowHeight(50);

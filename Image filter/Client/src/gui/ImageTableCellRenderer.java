@@ -11,8 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ImageTableCellRenderer extends JPanel implements TableCellRenderer {
 
-    public ImageTableCellRenderer() {
-        images = Repository.getImagesArrayList();
+    public ImageTableCellRenderer(CopyOnWriteArrayList<Image> images) {
+        this.images = images;
         nameLabel = new JLabel();
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         statusLabel = new JLabel();

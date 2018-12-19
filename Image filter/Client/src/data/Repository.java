@@ -8,20 +8,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Repository {
 
-    public static synchronized CopyOnWriteArrayList<Image> getImagesArrayList() {
+    public synchronized CopyOnWriteArrayList<Image> getImagesArrayList() {
         if (images == null) {
             images = new CopyOnWriteArrayList<>();
         }
         return images;
     }
 
-    public static synchronized ConcurrentLinkedQueue<Query> getQueriesQueue() {
+    public synchronized ConcurrentLinkedQueue<Query> getQueriesQueue() {
         if (queries == null) {
             queries = new ConcurrentLinkedQueue<>();
         }
         return queries;
     }
 
-    private static ConcurrentLinkedQueue<Query> queries;
-    private static CopyOnWriteArrayList<Image> images;
+    private ConcurrentLinkedQueue<Query> queries;
+    private CopyOnWriteArrayList<Image> images;
 }

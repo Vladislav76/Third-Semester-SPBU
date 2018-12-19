@@ -34,19 +34,13 @@ class ClientHandler implements Runnable {
                 if (System.currentTimeMillis() - time > PERIOD_OF_PROGRESS_UPDATING && tasks.size() > 0) {
                     FilterHandler[] doneTasks = new FilterHandler[tasks.size()];
                     int index = 0;
-
                     for (FilterHandler task : tasks) {
                         int imageID = task.getImageID();
-                        if (!task.isBreak()) {
-                            sendMessage(PROCESSING_PROGRESS_CODE, null, imageID, task.getPercentWork());
-                            if (task.isDone()) {
-                                byte[] byteArray = task.getResultBytes();
-                                sendMessage(IMAGE_CODE, byteArray, imageID, byteArray.length);
-                                doneTasks[index++] = task;
-                            }
+                        if (task.isBreak() || task.isDone()) {
+                            doneTasks[index++] = task;
                         }
                         else {
-                            doneTasks[index++] = task;
+                            sendMessage(PROCESSING_PROGRESS_CODE, null, imageID, task.getPercentWork());
                         }
                     }
 
@@ -54,6 +48,7 @@ class ClientHandler implements Runnable {
                     for (int i = 0; i < index; i++) {
                         tasks.remove(doneTasks[i]);
                     }
+
                     time = System.currentTimeMillis();
                 }
             }
@@ -113,7 +108,7 @@ class ClientHandler implements Runnable {
                  * 1. Add filtering task to ArrayList
                  * 2. Add filtering task to ExecutorService (for execution)
                  */
-                FilterHandler filterHandler = new FilterHandler(imageWidth, imageHeight, byteArray, filterID, imageID);
+                FilterHandler filterHandler = new FilterHandler(this, imageWidth, imageHeight, byteArray, filterID, imageID);
                 tasks.add(filterHandler);
                 executorService.execute(filterHandler);
                 return 1;
@@ -141,7 +136,7 @@ class ClientHandler implements Runnable {
      * 3. Send processed image:
      *   "image" <Image ID> <Bytes number> <Bytes>
      */
-    private void sendMessage(String code, byte[] data, int... values) throws IOException {
+    public synchronized void sendMessage(String code, byte[] data, int... values) throws IOException {
         out.writeUTF(code);
         switch (code) {
             case FILTERS_LIST_CODE:
@@ -189,7 +184,7 @@ class ClientHandler implements Runnable {
 
     private static final String FILTERS_LIST_CODE = "filters";
     private static final String PROCESSING_PROGRESS_CODE = "progress";
-    private static final String IMAGE_CODE = "image";
+    public static final String IMAGE_CODE = "image";
     private static final String CANCELED_TASK_ID_CODE = "cancel";
     private static final String DISCONNECTED_CLIENT_CODE = "q";
 }

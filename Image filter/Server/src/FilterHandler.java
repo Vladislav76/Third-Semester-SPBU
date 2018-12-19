@@ -3,12 +3,14 @@ import Filters.Filter;
 import Filters.GrayscaleFilter;
 import Filters.NegativeFilter;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FilterHandler implements Runnable {
 
-    public FilterHandler(int imageWidth, int imageHeight, byte[] sourceBytes, int filterID, int imageID) {
+    public FilterHandler(ClientHandler clientHandler, int imageWidth, int imageHeight, byte[] sourceBytes, int filterID, int imageID) {
+        this.clientHandler = clientHandler;
         this.sourceBytes = sourceBytes;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
@@ -47,6 +49,12 @@ public class FilterHandler implements Runnable {
         }
         if (!isBreak.get()) {
             isDone.set(true);
+            try {
+                clientHandler.sendMessage(ClientHandler.IMAGE_CODE, resultBytes, imageID, resultBytes.length);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -84,6 +92,7 @@ public class FilterHandler implements Runnable {
     private int imageWidth;
     private int imageHeight;
     private int imageID;
+    private ClientHandler clientHandler;
 
     private static final int BLUR_FILTER_ID = 0;
     private static final int NEGATIVE_FILTER_ID = 1;

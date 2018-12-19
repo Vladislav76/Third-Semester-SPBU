@@ -1,17 +1,21 @@
-package main;
+package test;
 
 import data.Repository;
+import main.Image;
+import main.Query;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ServerHandler implements Runnable {
+public class TestServerHandler implements Runnable {
 
-    public ServerHandler(String host, int port) {
+    public TestServerHandler(String host, int port, int queriesNumber, String filename, int filterID) {
         try {
             this.server = new Socket(host, port);
             loadedImages = new ArrayList<>();
@@ -21,6 +25,10 @@ public class ServerHandler implements Runnable {
             images = repository.getImagesArrayList();
             isUpdated = new AtomicBoolean(false);
             isConnected = new AtomicBoolean(false);
+            this.queriesNumber = queriesNumber;
+            this.fileName = filename;
+            this.filterID = filterID;
+            this.times = new long[queriesNumber];
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -44,6 +52,9 @@ public class ServerHandler implements Runnable {
     public Repository getRepository() {
         return repository;
     }
+    public long[] getTimes() {
+        return times;
+    }
 
     @Override
     public void run() {
@@ -51,10 +62,17 @@ public class ServerHandler implements Runnable {
             in = new DataInputStream(server.getInputStream());
             out = new DataOutputStream(server.getOutputStream());
 
-            while (!server.isInputShutdown()) {
-                getQuery();
+            while (true) {
+                if (loadedImages.size() < MAX_LOADIND_IMAGES_NUMBER && images.size() < queriesNumber) {
+                    sendImage(fileName, filterID);
+                }
                 getMessage();
+                if (images.size() == queriesNumber && images.get(queriesNumber - 1).getStatus() == Image.PROCESSED) {
+                    break;
+                }
             }
+
+            request(Query.DISCONNECTED_CLIENT_CODE);
 
             in.close();
             out.close();
@@ -102,6 +120,7 @@ public class ServerHandler implements Runnable {
             }
             if (entry.equals(Query.IMAGE_SENDING_CODE)) {
                 int imageID = in.readInt();
+                times[imageID] = System.currentTimeMillis() - times[imageID];
                 int imageSize = in.readInt();
                 byte[] byteArray = new byte[imageSize];
                 in.readFully(byteArray);
@@ -110,7 +129,6 @@ public class ServerHandler implements Runnable {
                     image.setStatus(Image.PROCESSED);
                     loadedImages.remove(image);
                     image.setData(byteArray);
-                    isUpdated.set(true);
                 }
             }
         }
@@ -161,7 +179,7 @@ public class ServerHandler implements Runnable {
     }
 
     private void sendImage (String fileName, int filterID) throws IOException {
-        Image image = new Image(fileName, newImageID++);
+        Image image = new Image(fileName, newImageID);
         loadedImages.add(image);
         images.add(image);
         image.setStatus(Image.UPDATED);
@@ -173,7 +191,8 @@ public class ServerHandler implements Runnable {
         out.writeInt(image.getSizeInBytes());
         out.write(image.getSourceBytes());
         out.flush();
-        isUpdated.set(true);
+        times[newImageID] = System.currentTimeMillis();
+        newImageID++;
     }
 
     private void cancelLastTask() throws IOException {
@@ -215,6 +234,10 @@ public class ServerHandler implements Runnable {
     private AtomicBoolean isUpdated;
     private ConcurrentLinkedQueue<Query> queries;
     private Repository repository;
+    private int queriesNumber;
+    private String fileName;
+    private int filterID;
+    private long[] times;
 
-    private static final int MAX_LOADIND_IMAGES_NUMBER = 3;
+    private static final int MAX_LOADIND_IMAGES_NUMBER = 1;
 }
