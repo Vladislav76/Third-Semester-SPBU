@@ -1,8 +1,11 @@
+package main;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Image {
 
@@ -10,9 +13,9 @@ public class Image {
         File file = new File(fileName);
         this.format = getFileExtension(file);
         this.image = ImageIO.read(file);
-        this.isReady = false;
         this.id = id;
         this.fileName = file.getName();
+        this.status = new AtomicInteger(0);
     }
 
     private static String getFileExtension(File file) {
@@ -23,12 +26,16 @@ public class Image {
         else return DEFAULT_FORMAT;
     }
 
+    public void saveImage(String fileName) throws IOException {
+        ImageIO.write(image, format, new File(fileName));
+    }
+
     /* Setters */
+    public void setStatus(int status) {
+        this.status.set(status);
+    }
     public void setPercentWork(int percent) {
         this.percentWork = percent;
-        if (percent == 100) {
-            isReady = true;
-        }
     }
     public void setData(byte[] bytes) {
         int size = getWidth() * getHeight();
@@ -44,6 +51,12 @@ public class Image {
     }
 
     /* Getters */
+    public String getFileName() {
+        return fileName;
+    }
+    public BufferedImage getImage() {
+        return image;
+    }
     public int getWidth() {
         return image.getWidth();
     }
@@ -53,26 +66,30 @@ public class Image {
     public int getID() {
         return id;
     }
+    public int getPercentWork() {
+        return percentWork;
+    }
     public int getSizeInBytes() {
         return ((DataBufferByte) image.getRaster().getDataBuffer()).getData().length;
     }
     public byte[] getSourceBytes() {
         return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
     }
-    public boolean isReady() {
-        return isReady;
-    }
-
-    public void saveImage(String dirName) throws IOException {
-        ImageIO.write(image, format, new File(dirName, fileName));
+    public int getStatus() {
+        return status.get();
     }
 
     private BufferedImage image;
     private int id;
-    private boolean isReady;
     private int percentWork;
     private String format;
     private String fileName;
+    private AtomicInteger status;
 
     private static final String DEFAULT_FORMAT = "png";
+    public static final int UPDATED = 0;
+    public static final int CANCELED = 1;
+    public static final int PROCESSED = 2;
+    public static final int UNCHANGED = 3;
+    public static final int READY = 4;
 }

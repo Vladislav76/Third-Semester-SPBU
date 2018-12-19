@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 
 class ClientHandler implements Runnable {
@@ -15,6 +14,8 @@ class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
+            printLog("Connected");
+            filters = Server.getFilters();
             in = new DataInputStream(client.getInputStream());
             out = new DataOutputStream(client.getOutputStream());
 
@@ -26,7 +27,7 @@ class ClientHandler implements Runnable {
                     break;
                 }
                 if (resultCode == 0) {
-                    System.out.println(client + ": Unknown request code.");
+                    printLog("Unknown request code.");
                 }
 
                 /* Send progress/result about all processing images to client. */
@@ -57,8 +58,6 @@ class ClientHandler implements Runnable {
                 }
             }
 
-            System.out.println("Disconnected: " + client);
-
             in.close();
             out.close();
             client.close();
@@ -86,9 +85,11 @@ class ClientHandler implements Runnable {
         if (in.available() > 0) {
             String entry = in.readUTF();
             if (entry.equals(DISCONNECTED_CLIENT_CODE)) {
+                printLog("Disconnected");
                 return -1;
             }
             if (entry.equals(FILTERS_LIST_CODE)) {
+                printLog("Filters list request");
                 sendMessage(FILTERS_LIST_CODE, null);
                 return 1;
             }
@@ -99,11 +100,11 @@ class ClientHandler implements Runnable {
                 int imageHeight = in.readInt();
                 int byteArrayLength = in.readInt();
 
-                System.out.println("filterID: " + filterID +
-                        "   imageID: " + imageID +
-                        "   imageSize: " + byteArrayLength +
-                        "   imageWidth: " + imageWidth +
-                        "   imageHeight: " + imageHeight);
+                printLog("filterID= " + filterID +
+                        ", imageID= " + imageID +
+                        ", imageSize= " + byteArrayLength +
+                        " bytes, imageWidth= " + imageWidth +
+                        ", imageHeight= " + imageHeight);
 
                 byte[] byteArray = new byte[byteArrayLength];
                 in.readFully(byteArray);
@@ -120,6 +121,7 @@ class ClientHandler implements Runnable {
             if (entry.equals(CANCELED_TASK_ID_CODE)) {
                 int imageID = in.readInt();
                 findAndStopTaskByImageId(imageID);
+                printLog("Canceling of task " + imageID);
                 return 1;
             }
             return 0;
@@ -143,10 +145,11 @@ class ClientHandler implements Runnable {
         out.writeUTF(code);
         switch (code) {
             case FILTERS_LIST_CODE:
-                out.writeInt(Server.FILTERS.length);
-                for (int i = 0; i < Server.FILTERS.length; i++) {
-                    out.writeUTF(Server.FILTERS[i]);
+                out.writeInt(filters.length);
+                for (int i = 0; i < filters.length; i++) {
+                    out.writeUTF(filters[i]);
                 }
+                printLog("Filters list are sent");
                 break;
             case PROCESSING_PROGRESS_CODE:
                 out.writeInt(values[0]);
@@ -170,11 +173,17 @@ class ClientHandler implements Runnable {
         return false;
     }
 
+    private void printLog(String message) {
+        System.out.println("Client [port=" + client.getPort() + ", localport=" +
+                client.getLocalPort() + "]: " + message);
+    }
+
     private Socket client;
     private DataInputStream in;
     private DataOutputStream out;
     private ArrayList<FilterHandler> tasks;
     private ExecutorService executorService;
+    private String[] filters;
 
     private static final long PERIOD_OF_PROGRESS_UPDATING = 1_000;
 

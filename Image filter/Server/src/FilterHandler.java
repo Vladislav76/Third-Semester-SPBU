@@ -81,6 +81,6 @@ public class FilterHandler implements Runnable {
     private int imageHeight;
     private int imageID;
 
-    private static final int BLUR_FILTER_ID = 1;
-    private static final int NEGATIVE_FILTER_ID = 2;
+    private static final int BLUR_FILTER_ID = 0;
+    private static final int NEGATIVE_FILTER_ID = 1;
 }
