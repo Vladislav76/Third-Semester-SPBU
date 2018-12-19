@@ -1,5 +1,6 @@
 import Filters.BlurFilter;
 import Filters.Filter;
+import Filters.GrayscaleFilter;
 import Filters.NegativeFilter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,6 +28,9 @@ public class FilterHandler implements Runnable {
                 break;
             case NEGATIVE_FILTER_ID:
                 filter = new NegativeFilter(imageWidth, imageHeight, sourceBytes, resultBytes);
+                break;
+            case GRAYSCALE_FILTER_ID:
+                filter = new GrayscaleFilter(imageWidth, imageHeight, sourceBytes, resultBytes);
                 break;
         }
         return filter;
@@ -83,4 +87,5 @@ public class FilterHandler implements Runnable {
 
     private static final int BLUR_FILTER_ID = 0;
     private static final int NEGATIVE_FILTER_ID = 1;
+    private static final int GRAYSCALE_FILTER_ID = 2;
 }
