@@ -1,0 +1,7 @@
+transformer/.stack-work/
+transformer/transformer.cabal
+/**/*~
+/**/*hi
+/**/*o
+/**/Main
+/**/.DS_Store
