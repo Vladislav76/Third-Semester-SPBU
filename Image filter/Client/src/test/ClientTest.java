@@ -44,14 +44,15 @@ public class ClientTest {
         }
         System.out.println();
 
-                Arrays.sort(allTimes);
+        Arrays.sort(allTimes);
 
         int k1 = allTimes.length / 2;
         int k2 = (allTimes.length - 1) / 2;
         long medianTime = (allTimes[k1] + allTimes[k2]) / 2;
         long averageTime = allTime / allTimes.length;
 
-        System.out.println("Queries number=" + clientsNumber * queriesNumber +
+        System.out.println("Speed=" + (double) (clientsNumber * queriesNumber) / (elapsed / 1000) +
+                " | Queries number=" + clientsNumber * queriesNumber +
                 " | Execution time=" + elapsed + " ms" +
                 " | All time=" + allTime + " ms" +
                 " | Average time=" + averageTime + " ms" +
@@ -59,6 +60,6 @@ public class ClientTest {
     }
 
     public static void main(String[] args) {
-        test(3, "pictures/example_3.jpg", 1, 10);
+        test(100, "pictures/example_4.png", 1, 1);
     }
 }

@@ -172,6 +172,7 @@ public class ClientPanel extends JPanel implements Runnable {
                         image.setStatus(Image.UNCHANGED);
                         break;
                     case Image.PROCESSED:
+                        model.setValueAt(100, index, 1);
                         model.setValueAt("OK", index, 2);
                         image.setStatus(Image.READY);
                         break;
