@@ -1,7 +1,7 @@
-import Filters.BlurFilter;
-import Filters.Filter;
-import Filters.GrayscaleFilter;
-import Filters.NegativeFilter;
+import filters.BlurFilter;
+import filters.Filter;
+import filters.GrayscaleFilter;
+import filters.NegativeFilter;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;

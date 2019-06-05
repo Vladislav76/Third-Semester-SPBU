@@ -32,7 +32,7 @@ public class Server {
 
     private void loadConfig() throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream("src/app.config"));
+        properties.load(new FileInputStream("Server-Side/src/app.config"));
         filters = properties.get("FILTERS").toString().split("#");
     }
 

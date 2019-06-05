@@ -64,7 +64,7 @@ public class ClientPanel extends JPanel implements Runnable {
                 new Insets(10,10,30,30), 10, 10);
         add(cancelingButton, gbc);
 
-        /* Filters list */
+        /* filters list */
         filters = serverHandler.getFiltersList();
         dropDownListBox = new JComboBox<>(filters);
         gbc = new GridBagConstraints(1, 2, 1, 1, 22, 8,
@@ -73,7 +73,7 @@ public class ClientPanel extends JPanel implements Runnable {
         add(dropDownListBox, gbc);
 
         /* Text field */
-        textField = new JTextField("/home/vladislav/Documents/Development/GitHub/Homework/Third_Semester_SPBU/Image filter/Client/pictures/example_3.jpg", 10);
+        textField = new JTextField("/home/vladislav/Documents/Development/GitHub/SPBU/Third-Semester-SPBU/Image-Filter/Client-Side/pictures/example_3.jpg", 10);
         gbc = new GridBagConstraints(1, 1, 2, 1, 50, 8,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(10, 10, 10, 30), 10, 10);

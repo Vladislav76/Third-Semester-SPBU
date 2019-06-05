@@ -84,7 +84,7 @@ class ClientHandler implements Runnable {
                 return -1;
             }
             if (entry.equals(FILTERS_LIST_CODE)) {
-                printLog("Filters list request");
+                printLog("filters list request");
                 sendMessage(FILTERS_LIST_CODE, null);
                 return 1;
             }
@@ -144,7 +144,7 @@ class ClientHandler implements Runnable {
                 for (int i = 0; i < filters.length; i++) {
                     out.writeUTF(filters[i]);
                 }
-                printLog("Filters list are sent");
+                printLog("filters list are sent");
                 break;
             case PROCESSING_PROGRESS_CODE:
                 out.writeInt(values[0]);

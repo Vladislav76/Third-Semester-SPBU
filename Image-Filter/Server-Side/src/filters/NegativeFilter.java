@@ -1,4 +1,4 @@
-package Filters;
+package filters;
 
 public class NegativeFilter extends Filter {
 
